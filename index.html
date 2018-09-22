@@ -19,10 +19,11 @@
 			}
 
 			body {
-				background-color: yellow;
+				background-color: black;
 				height: 100%;
 				margin: 0;
 				padding: 0;
+				width: 100%;
 			}
 
 			#candidates {
@@ -168,6 +169,50 @@
 		<!-- Animation Installation -->
 		<script>
 			/**
+			 * Transforms p in [0, 1] to q in [0, 1] of different acceleration.
+			 */
+			ColoredVote.t = function(p) {
+				return 0.5 * (1 - Math.cos(p * Math.PI));
+			};
+
+			/**
+			 * This function fades in the available selection when the page is loaded
+			 * for the first time.
+			 */
+			ColoredVote.fadeInCandidates = function(dur, table, callback) {
+				// First make the table invisible
+				table.style.opacity = 0;
+				table.style.width = 0;
+				table.style.height = 0;
+
+				// Then fade it in over a set duration
+				const START_TIME = Date.now();
+
+				const ANIMATION = () => {
+					let CURR_TIME = Date.now();
+
+					if ((CURR_TIME - START_TIME) < dur) {
+						const p = ColoredVote.t((CURR_TIME - START_TIME) / dur);
+
+						table.style.opacity = p;
+						table.style.width = (100 * p) + "%";
+						table.style.height = (100 * p) + "%";
+
+						id = requestAnimationFrame(ANIMATION);
+					} else {
+						table.style.opacity = 1;
+						table.style.width = "100%";
+						table.style.height = "100%";
+						callback(table);
+					}
+				};
+
+				requestAnimationFrame(ANIMATION);
+
+				console.log("fadeInCandidates");
+			};
+
+			/**
 			 * This function adds all of the fancy animations that will make the page
 			 * feel more professional.
 			 */
@@ -185,10 +230,11 @@
 			 */
 			ColoredVote.loadHandler = function(e) {
 				const NUM_CANDIDATES = 4;
+				const FADE_IN_DUR_MS = 450;
 				const table = document.getElementById("candidates");
 
 				ColoredVote.addAvailableCandidates(NUM_CANDIDATES, table);
-				ColoredVote.installClickAnimations(table);
+				ColoredVote.fadeInCandidates(FADE_IN_DUR_MS, table, ColoredVote.installClickAnimations);
 
 				console.log("loadHandler");
 			};
