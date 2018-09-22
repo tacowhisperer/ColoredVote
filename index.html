@@ -166,14 +166,17 @@
 				ColoredVote.colorizeCandidates(numCandidates, table);
 
 				// Finally we make them all be displayed on the screen
+				const p = 100 / cPR;
 				const candidates = document.getElementsByClassName("candidate");
 				for (let i = 0; i < candidates.length; i++) {
-					const p = (100 / cPR) + "%";
-					candidates[i].style.width = p;
-					candidates[i].style.height = p;
+					const q = p + "%";
+					candidates[i].style.width = q;
+					candidates[i].style.height = q;
 				}
 
 				console.log("addAvailableCandidates");
+
+				return p;
 			};
 		</script>
 
@@ -183,14 +186,14 @@
 			 * This function fades in the available selection when the page is loaded
 			 * for the first time.
 			 */
-			ColoredVote.fadeInCandidates = function(dur, table, callback) {
+			ColoredVote.fadeInCandidates = function(selDur, p, dur, table, callback) {
 				// First make the table invisible
 				table.style.opacity = 0;
 				table.style.width = 0;
 				table.style.height = 0;
 
 				// Swing transformation form jQuery
-				const f = p => 0.5 * (1 - Math.cos(p * Math.PI));
+				const f = x => 0.5 * (1 - Math.cos(x * Math.PI));
 
 				// Then fade it in over a set duration
 				const START_TIME = Date.now();
@@ -199,18 +202,18 @@
 					let CURR_TIME = Date.now();
 
 					if ((CURR_TIME - START_TIME) < dur) {
-						const p = f((CURR_TIME - START_TIME) / dur);
+						const x = f((CURR_TIME - START_TIME) / dur);
 
-						table.style.opacity = p;
-						table.style.width = (100 * p) + "%";
-						table.style.height = (100 * p) + "%";
+						table.style.opacity = x;
+						table.style.width = (100 * x) + "%";
+						table.style.height = (100 * x) + "%";
 
 						id = requestAnimationFrame(ANIMATION);
 					} else {
 						table.style.opacity = 1;
 						table.style.width = "100%";
 						table.style.height = "100%";
-						callback(table);
+						callback(selDur, p, table);
 					}
 				};
 
@@ -219,11 +222,45 @@
 				console.log("fadeInCandidates");
 			};
 
+			ColoredVote.selectCandidate = function(selectedCell, table, lock) {
+				console.log("selectCandidate");
+			};
+
+			ColoredVote.deselectCandidate = function(pInit, table, lock) {
+				console.log("deselectCandidate");
+			};
+
 			/**
 			 * This function adds all of the fancy animations that will make the page
 			 * feel more professional.
 			 */
-			ColoredVote.installClickAnimations = function(table) {
+			ColoredVote.installClickAnimations = function(selDur, p, table) {
+				let LOCK = [false]; // Ensures that no other selecting may occur while animating.
+				let MOUSE_TARGET = null;
+				const pInit = p;
+				const cells = ColoredVote.cellsIn(table);
+
+				for (let i = 0; i < cells.length; i++) {
+					const cell = cells[i];
+
+					// Set the target of the mousedown event.
+					cell.addEventListener("mousedown", e => MOUSE_TARGET = e.target);
+
+					// Set the target of the mouseup event.
+					cell.addEventListener("mouseup", e => {
+						// Only select if the current target is the same as the mousedown target.
+						if (e.target === MOUSE_TARGET) {
+							// Animate differently depending if there is a selected candidate or not.
+							if (e.target.style.width === "100%") {
+								if (!LOCK[0])
+									ColoredVote.deselectCandidate(pInit, table, LOCK);
+							} else {
+								if (!LOCK[0])
+									ColoredVote.selectCandidate(e.target, table, LOCK);
+							}
+						}
+					});
+				}
 
 				console.log("installClickAnimations");
 			};
@@ -238,10 +275,11 @@
 			ColoredVote.loadHandler = function(e) {
 				const NUM_CANDIDATES = 4;
 				const FADE_IN_DUR_MS = 450;
+				const SELECT_ANIM_DUR_MS = 250;
 				const table = document.getElementById("candidates");
 
-				ColoredVote.addAvailableCandidates(NUM_CANDIDATES, table);
-				ColoredVote.fadeInCandidates(FADE_IN_DUR_MS, table, ColoredVote.installClickAnimations);
+				const p = ColoredVote.addAvailableCandidates(NUM_CANDIDATES, table);
+				ColoredVote.fadeInCandidates(SELECT_ANIM_DUR_MS, p, FADE_IN_DUR_MS, table, ColoredVote.installClickAnimations);
 
 				console.log("loadHandler");
 			};
