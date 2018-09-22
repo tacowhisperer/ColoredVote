@@ -222,11 +222,23 @@
 				console.log("fadeInCandidates");
 			};
 
-			ColoredVote.selectCandidate = function(selectedCell, table, lock) {
+			ColoredVote.selectCandidate = function(dur, selectedCell, table, lock) {
+				const ANIMATION = () => {
+
+				};
+
+				requestAnimationFrame(ANIMATION);
+
 				console.log("selectCandidate");
 			};
 
-			ColoredVote.deselectCandidate = function(pInit, table, lock) {
+			ColoredVote.deselectCandidate = function(dur, pInit, table, lock) {
+				const ANIMATION = () => {
+
+				};
+
+				requestAnimationFrame(ANIMATION);
+
 				console.log("deselectCandidate");
 			};
 
@@ -254,12 +266,12 @@
 							if (e.target.style.width === "100%") {
 								if (!LOCK[0]) {
 									LOCK[0] = true;
-									ColoredVote.deselectCandidate(pInit, table, LOCK);
+									ColoredVote.deselectCandidate(selDur, pInit, table, LOCK);
 								}
 							} else {
 								if (!LOCK[0]) {
 									LOCK[0] = true;
-									ColoredVote.selectCandidate(e.target, table, LOCK);
+									ColoredVote.selectCandidate(selDur, e.target, table, LOCK);
 								}
 							}
 						}
