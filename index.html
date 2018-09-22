@@ -252,11 +252,15 @@
 						if (e.target === MOUSE_TARGET) {
 							// Animate differently depending if there is a selected candidate or not.
 							if (e.target.style.width === "100%") {
-								if (!LOCK[0])
+								if (!LOCK[0]) {
+									LOCK[0] = true;
 									ColoredVote.deselectCandidate(pInit, table, LOCK);
+								}
 							} else {
-								if (!LOCK[0])
+								if (!LOCK[0]) {
+									LOCK[0] = true;
 									ColoredVote.selectCandidate(e.target, table, LOCK);
+								}
 							}
 						}
 					});
