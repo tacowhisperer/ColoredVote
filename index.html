@@ -19,7 +19,9 @@
 			}
 
 			body {
-				background-color: black;
+				/* heropatterns.com */
+				background-color: #DFDBE5;
+				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='%2355456f' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M5 3.59L1.46.05.05 1.46 3.59 5 .05 8.54l1.41 1.41L5 6.41l3.54 3.54 1.41-1.41L6.41 5l3.54-3.54L8.54.05 5 3.59zM17 2h24v2H17V2zm0 4h24v2H17V6zM2 17h2v24H2V17zm4 0h2v24H6V17z'/%3E%3C/g%3E%3C/svg%3E");
 				height: 100%;
 				margin: 0;
 				padding: 0;
@@ -29,6 +31,7 @@
 			#candidates {
 				border-collapse: collapse;
 				height: 100%;
+				margin: 0 auto;
 				width: 100%;
 			}
 
@@ -36,6 +39,14 @@
 				box-shadow: 0px 0px 5px rgb(120, 120, 120);
 				margin: 0;
 				padding: 0;
+			}
+
+			#candidateswrapper {
+				align-items: center;
+				display: flex;
+				height: 100%;
+				justify-content: center;
+				width: 100%;
 			}
 		</style>
 
@@ -169,13 +180,6 @@
 		<!-- Animation Installation -->
 		<script>
 			/**
-			 * Transforms p in [0, 1] to q in [0, 1] of different acceleration.
-			 */
-			ColoredVote.t = function(p) {
-				return 0.5 * (1 - Math.cos(p * Math.PI));
-			};
-
-			/**
 			 * This function fades in the available selection when the page is loaded
 			 * for the first time.
 			 */
@@ -185,6 +189,9 @@
 				table.style.width = 0;
 				table.style.height = 0;
 
+				// Swing transformation form jQuery
+				const f = p => 0.5 * (1 - Math.cos(p * Math.PI));
+
 				// Then fade it in over a set duration
 				const START_TIME = Date.now();
 
@@ -192,7 +199,7 @@
 					let CURR_TIME = Date.now();
 
 					if ((CURR_TIME - START_TIME) < dur) {
-						const p = ColoredVote.t((CURR_TIME - START_TIME) / dur);
+						const p = f((CURR_TIME - START_TIME) / dur);
 
 						table.style.opacity = p;
 						table.style.width = (100 * p) + "%";
@@ -254,6 +261,8 @@
 	</head>
 
 	<body>
-		<table id="candidates"></table>
+		<div id="candidateswrapper">
+			<table id="candidates"></table>
+		</div>
 	</body>
 </html>
