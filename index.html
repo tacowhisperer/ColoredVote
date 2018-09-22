@@ -36,7 +36,7 @@
 			}
 
 			.candidate {
-				box-shadow: 0px 0px 5px rgb(120, 120, 120);
+				box-shadow: 0px 0px 5px rgba(80, 80, 80, 0.65);
 				margin: 0;
 				padding: 0;
 			}
@@ -73,6 +73,11 @@
 				"blue": "rgba(0, 145, 235, 1)",
 				"orange": "rgba(255, 145, 0, 1)",
 				"green": "rgba(0, 190, 0, 1)",
+				"yellow": "rgba(255, 255, 0, 1)",
+				"red": "rgba(255, 0, 0, 1)",
+				"brown": "rgba(140, 70, 20, 1)",
+				"indigo": "rgba(75, 0, 130, 1)",
+				"gray": "rgba(112, 128, 144, 1)",
 				"null": "rgba(0, 0, 0, 1)"
 			};
 
@@ -144,11 +149,11 @@
 				const cPR = Math.round(Math.sqrt(numCandidates));
 
 				// First add the td cels into the table
-				for (let i = 0; i < Math.ceil(numCandidates / cPR); i++) {
+				for (let i = 0; i < nR; i++) {
 					const row = document.createElement("tr");
 
 					for (let j = 0; j < cPR; j++) {
-						if ((i + 1) * (j + 1) <= numCandidates) {
+						if (i * cPR + (j + 1) <= numCandidates) {
 							const td = document.createElement("td");
 							td.classList.add("candidate");
 							row.appendChild(td);
@@ -370,7 +375,7 @@
 			 * finished loading.
 			 */
 			ColoredVote.loadHandler = function(e) {
-				const NUM_CANDIDATES = 4;
+				const NUM_CANDIDATES = 7;
 				const FADE_IN_DUR_MS = 450;
 				const SELECT_ANIM_DUR_MS = 150;
 				const table = document.getElementById("candidates");
