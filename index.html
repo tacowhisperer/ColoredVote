@@ -35,7 +35,6 @@
 				box-shadow: 0px 0px 5px rgb(120, 120, 120);
 				margin: 0;
 				padding: 0;
-				width: 50%;
 			}
 		</style>
 
@@ -84,28 +83,38 @@
 		<!-- Candidate Installation -->
 		<script>
 			/**
+			 * This function takes in a table from a DOM and returns an array
+			 * of all cells in the table.
+			 */
+			ColoredVote.cellsIn = function(table) {
+				const cells = [];
+				const rows = table.rows;
+				for (let i in rows) {
+					const row = rows[i].cells !== undefined ? rows[i].cells : [];
+					for (let j = 0; j < row.length; j++)
+						cells.push(row[j]);
+				}
+
+				return cells;
+			};
+
+			/**
 			 * This function takes all of the elements of some table and makes them a
 			 * distinct color
 			 */
 			ColoredVote.colorizeCandidates = function(numCandidates, table) {
-				const rows = table.rows;
+				const cells = ColoredVote.cellsIn(table);
 				const colors = ColoredVote.getColors();
 				const l = colors.length - 1;
-				const n = numCandidates - 1;
 
 				// Used to iterate through all available colors independent of the number of cells in each row.
 				let h = 0;
 
 				// Iterate through all of the rows and colorize them.
-				for (let i in rows) {
-					const row = rows[i].cells !== undefined ? rows[i].cells : [];
-					for (let j = 0; j < row.length; j++) {
-						const cell = row[j];
-						const k = Math.min(h, l);
+				for (let i = 0; i < cells.length; i++) {
+					const cell = cells[i];
 
-						cell.style.backgroundColor = ColoredVote.getRGBA(h > n ? NULL_COLOR : colors[k]);
-						h++;
-					}
+					cell.style.backgroundColor = ColoredVote.getRGBA(h > l ? NULL_COLOR : colors[h++]);
 				}
 
 				console.log("colorizeCandidates");
@@ -116,10 +125,41 @@
 			 * candidates that will be displayed on the screen.
 			 */
 			ColoredVote.addAvailableCandidates = function(numCandidates, table) {
+				// The total number of rows
+				const nR = Math.ceil(Math.sqrt(numCandidates));
+
 				// The number of candidates per row
 				const cPR = Math.round(Math.sqrt(numCandidates));
 
+				// First add the td cels into the table
+				for (let i = 0; i < Math.ceil(numCandidates / cPR); i++) {
+					const row = document.createElement("tr");
+
+					for (let j = 0; j < cPR; j++) {
+						if ((i + 1) * (j + 1) <= numCandidates) {
+							const td = document.createElement("td");
+							td.classList.add("candidate");
+							row.appendChild(td);
+						}
+
+						// We have more table slots than candidates available
+						else
+							break;
+					}
+
+					table.appendChild(row);
+				}
+
+				// Then colorize them
 				ColoredVote.colorizeCandidates(numCandidates, table);
+
+				// Finally we make them all be displayed on the screen
+				const candidates = document.getElementsByClassName("candidate");
+				for (let i = 0; i < candidates.length; i++) {
+					const p = (100 / cPR) + "%";
+					candidates[i].style.width = p;
+					candidates[i].style.height = p;
+				}
 
 				console.log("addAvailableCandidates");
 			};
@@ -144,9 +184,10 @@
 			 * finished loading.
 			 */
 			ColoredVote.loadHandler = function(e) {
+				const NUM_CANDIDATES = 4;
 				const table = document.getElementById("candidates");
 
-				ColoredVote.addAvailableCandidates(4, table);
+				ColoredVote.addAvailableCandidates(NUM_CANDIDATES, table);
 				ColoredVote.installClickAnimations(table);
 
 				console.log("loadHandler");
@@ -167,19 +208,6 @@
 	</head>
 
 	<body>
-		<table id="candidates">
-			<tr>
-				<td class="candidate">
-				</td>
-				<td class="candidate">
-				</td>
-			</tr>
-			<tr>
-				<td class="candidate">
-				</td>
-				<td class="candidate">
-				</td>
-			</tr>
-		</table>
+		<table id="candidates"></table>
 	</body>
 </html>
