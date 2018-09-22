@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- Title game is weak at the moment. -->
+		<title>Simple Vote!</title>
+
+		<!-- Determines the color of the address bar in Chrome mobile. -->
+		<meta class="barcolor" id="chromebarcolor" name="theme-color" content=""/>
+
+		<!-- No need to zoom into the colors. -->
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no"/>
+
+		<!-- Minor styling to make it all flow together. -->
+		<style>
+			html {
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				background-color: yellow;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			#candidates {
+				border-collapse: collapse;
+				height: 100%;
+				width: 100%;
+			}
+
+			.candidate {
+				box-shadow: 0px 0px 5px rgb(120, 120, 120);
+				margin: 0;
+				padding: 0;
+				width: 50%;
+			}
+		</style>
+
+		<!-- World Context -->
+		<script>
+			/**
+			 * Context of the functions for the system.
+			 */
+			const ColoredVote = {};
+		</script>
+
+		<!-- RGBA Colors -->
+		<script>
+			/**
+			 * The "null" color.
+			 */
+			const NULL_COLOR = "null";
+
+			/**
+			 * Colors as rgba values.
+			 */
+			const COLORS = {
+				"pink": "rgba(255, 0, 255, 1)",
+				"blue": "rgba(0, 145, 235, 1)",
+				"orange": "rgba(255, 145, 0, 1)",
+				"green": "rgba(0, 190, 0, 1)",
+				"null": "rgba(0, 0, 0, 1)"
+			};
+
+			/**
+			 * Uses the available COLORS to return the array of key values as colors
+			 * sans NULL_COLOR.
+			 */
+			ColoredVote.getColors = function() {
+				return Object.keys(COLORS).filter(c => c !== NULL_COLOR);
+			};
+
+			/**
+			 * Uses the available COLORS to get a valid rgba string from a color name.
+			 */
+			ColoredVote.getRGBA = function(colorName) {
+				return typeof COLORS[colorName] === "string" ? COLORS[colorName] : COLORS[NULL_COLOR];
+			};
+		</script>
+
+		<!-- Candidate Installation -->
+		<script>
+			/**
+			 * This function takes all of the elements of some table and makes them a
+			 * distinct color
+			 */
+			ColoredVote.colorizeCandidates = function(numCandidates, table) {
+				const rows = table.rows;
+				const colors = ColoredVote.getColors();
+				const l = colors.length - 1;
+				const n = numCandidates - 1;
+
+				// Used to iterate through all available colors independent of the number of cells in each row.
+				let h = 0;
+
+				// Iterate through all of the rows and colorize them.
+				for (let i in rows) {
+					const row = rows[i].cells !== undefined ? rows[i].cells : [];
+					for (let j = 0; j < row.length; j++) {
+						const cell = row[j];
+						const k = Math.min(h, l);
+
+						cell.style.backgroundColor = ColoredVote.getRGBA(h > n ? NULL_COLOR : colors[k]);
+						h++;
+					}
+				}
+
+				console.log("colorizeCandidates");
+			};
+
+			/**
+			 * This function takes in the table DOM element and adds all of the desired
+			 * candidates that will be displayed on the screen.
+			 */
+			ColoredVote.addAvailableCandidates = function(numCandidates, table) {
+				// The number of candidates per row
+				const cPR = Math.round(Math.sqrt(numCandidates));
+
+				ColoredVote.colorizeCandidates(numCandidates, table);
+
+				console.log("addAvailableCandidates");
+			};
+		</script>
+
+		<!-- Animation Installation -->
+		<script>
+			/**
+			 * This function adds all of the fancy animations that will make the page
+			 * feel more professional.
+			 */
+			ColoredVote.installClickAnimations = function(table) {
+
+				console.log("installClickAnimations");
+			};
+		</script>
+
+		<!-- Load Handlers and Initializations -->
+		<script>
+			/**
+			 * This function handles everything that must happen once the DOM has
+			 * finished loading.
+			 */
+			ColoredVote.loadHandler = function(e) {
+				const table = document.getElementById("candidates");
+
+				ColoredVote.addAvailableCandidates(4, table);
+				ColoredVote.installClickAnimations(table);
+
+				console.log("loadHandler");
+			};
+
+			/**
+			 * This function starts the ColoredVote system on the browser.
+			 */
+			ColoredVote.start = function () {
+				window.addEventListener("load", ColoredVote.loadHandler);
+
+				console.log("start");
+			};
+		</script>
+
+		<!-- Instantiation -->
+		<script>ColoredVote.start();</script>
+	</head>
+
+	<body>
+		<table id="candidates">
+			<tr>
+				<td class="candidate">
+				</td>
+				<td class="candidate">
+				</td>
+			</tr>
+			<tr>
+				<td class="candidate">
+				</td>
+				<td class="candidate">
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
