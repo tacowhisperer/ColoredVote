@@ -222,9 +222,51 @@
 				console.log("fadeInCandidates");
 			};
 
-			ColoredVote.selectCandidate = function(dur, selectedCell, table, lock) {
-				const ANIMATION = () => {
+			ColoredVote.selectCandidate = function(dur, pInit, selectedCell, table, lock) {
+				// Available cells from the table
+				const cells = ColoredVote.cellsIn(table);
 
+				// Swing transformation form jQuery
+				const f = x => 0.5 * (1 - Math.cos(x * Math.PI));
+
+				const MS_DUR = dur;
+				const START_TIME = Date.now();
+				const ANIMATION = () => {
+					let CURR_TIME = Date.now();
+
+					if ((CURR_TIME - START_TIME) < MS_DUR) {
+						const q = f((CURR_TIME - START_TIME) / MS_DUR);
+						const p = 1 - q;
+
+						// Go through all of the cells and calculate their next width/height
+						for (let i = 0; i < cells.length; i++) {
+							const cell = cells[i];
+
+							// Start val = pInit%, End val = 0%
+							cell.style.width = (p * pInit) + "%";
+							cell.style.height = (p * pInit) + "%";
+						}
+
+						// Make the selected cell animate forward correctly.
+						selectedCell.style.width = (p * pInit + q * 100) + "%";
+						selectedCell.style.height = (p * pInit + q * 100) + "%";
+
+						requestAnimationFrame(ANIMATION);
+					} else {
+						// Go through all of the cells and ensure that their width is 0
+						for (let i = 0; i < cells.length; i++) {
+							const cell = cells[i];
+
+							cell.style.width = "0%";
+							cell.style.height = "0%";
+						}
+
+						// Ensure that the selected cell occupies the entire available space
+						selectedCell.style.width = "100%";
+						selectedCell.style.height = "100%";
+
+						lock[0] = false;
+					}
 				};
 
 				requestAnimationFrame(ANIMATION);
@@ -232,9 +274,47 @@
 				console.log("selectCandidate");
 			};
 
-			ColoredVote.deselectCandidate = function(dur, pInit, table, lock) {
-				const ANIMATION = () => {
+			ColoredVote.deselectCandidate = function(dur, pInit, selectedCell, table, lock) {
+				// Available cells from the table
+				const cells = ColoredVote.cellsIn(table);
 
+				// Swing transformation form jQuery
+				const f = x => 0.5 * (1 - Math.cos(x * Math.PI));
+
+				const MS_DUR = dur;
+				const START_TIME = Date.now();
+				const ANIMATION = () => {
+					let CURR_TIME = Date.now();
+
+					if ((CURR_TIME - START_TIME) < MS_DUR) {
+						const q = f((CURR_TIME - START_TIME) / MS_DUR);
+						const p = 1 - q;
+
+						// Go through all of the cells and calculate their next width/height
+						for (let i = 0; i < cells.length; i++) {
+							const cell = cells[i];
+
+							// Start val = 0%, End val = pInit%
+							cell.style.width = (q * pInit) + "%";
+							cell.style.height = (q * pInit) + "%";
+						}
+
+						// Make the selected cell animate backward correctly.
+						selectedCell.style.width = (p * 100 + q * pInit) + "%";
+						selectedCell.style.height = (p * 100 + q * pInit) + "%";
+
+						requestAnimationFrame(ANIMATION);
+					} else {
+						// Go through all of the cells and ensure that their width is pInit
+						for (let i = 0; i < cells.length; i++) {
+							const cell = cells[i];
+
+							cell.style.width = pInit + "%";
+							cell.style.height = pInit + "%";
+						}
+
+						lock[0] = false;
+					}
 				};
 
 				requestAnimationFrame(ANIMATION);
@@ -256,22 +336,23 @@
 					const cell = cells[i];
 
 					// Set the target of the mousedown event.
-					cell.addEventListener("mousedown", e => MOUSE_TARGET = e.target);
+					cell.addEventListener("mousedown", e => MOUSE_TARGET = cell);
 
 					// Set the target of the mouseup event.
 					cell.addEventListener("mouseup", e => {
 						// Only select if the current target is the same as the mousedown target.
-						if (e.target === MOUSE_TARGET) {
+						if (cell === MOUSE_TARGET) {
+
 							// Animate differently depending if there is a selected candidate or not.
-							if (e.target.style.width === "100%") {
+							if (cell.style.width === "100%") {
 								if (!LOCK[0]) {
 									LOCK[0] = true;
-									ColoredVote.deselectCandidate(selDur, pInit, table, LOCK);
+									ColoredVote.deselectCandidate(selDur, pInit, cell, table, LOCK);
 								}
 							} else {
 								if (!LOCK[0]) {
 									LOCK[0] = true;
-									ColoredVote.selectCandidate(selDur, e.target, table, LOCK);
+									ColoredVote.selectCandidate(selDur, pInit, cell, table, LOCK);
 								}
 							}
 						}
@@ -291,7 +372,7 @@
 			ColoredVote.loadHandler = function(e) {
 				const NUM_CANDIDATES = 4;
 				const FADE_IN_DUR_MS = 450;
-				const SELECT_ANIM_DUR_MS = 250;
+				const SELECT_ANIM_DUR_MS = 150;
 				const table = document.getElementById("candidates");
 
 				const p = ColoredVote.addAvailableCandidates(NUM_CANDIDATES, table);
