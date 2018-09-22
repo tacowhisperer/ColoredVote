@@ -234,6 +234,9 @@
 				// Swing transformation form jQuery
 				const f = x => 0.5 * (1 - Math.cos(x * Math.PI));
 
+				// Theme color for mobile chrome users
+				const metaThemeColor = document.getElementById("chromebarcolor");
+
 				const MS_DUR = dur;
 				const START_TIME = Date.now();
 				const ANIMATION = () => {
@@ -270,6 +273,9 @@
 						selectedCell.style.width = "100%";
 						selectedCell.style.height = "100%";
 
+						// Add the selected color to the Chrome bar
+						metaThemeColor.setAttribute("content", selectedCell.style.backgroundColor);
+
 						lock[0] = false;
 					}
 				};
@@ -285,6 +291,9 @@
 
 				// Swing transformation form jQuery
 				const f = x => 0.5 * (1 - Math.cos(x * Math.PI));
+
+				// Theme color for mobile chrome users
+				const metaThemeColor = document.getElementById("chromebarcolor");
 
 				const MS_DUR = dur;
 				const START_TIME = Date.now();
@@ -317,6 +326,9 @@
 							cell.style.width = pInit + "%";
 							cell.style.height = pInit + "%";
 						}
+
+						// Remove the selected color from the Chrome bar
+						metaThemeColor.setAttribute("content", "");
 
 						lock[0] = false;
 					}
