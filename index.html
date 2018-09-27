@@ -134,8 +134,6 @@
 
 					cell.style.backgroundColor = ColoredVote.getRGBA(h > l ? NULL_COLOR : colors[h++]);
 				}
-
-				console.log("colorizeCandidates");
 			};
 
 			/**
@@ -180,8 +178,6 @@
 					candidates[i].style.height = q;
 				}
 
-				console.log("addAvailableCandidates");
-
 				return p;
 			};
 		</script>
@@ -224,8 +220,6 @@
 				};
 
 				requestAnimationFrame(ANIMATION);
-
-				console.log("fadeInCandidates");
 			};
 
 			ColoredVote.selectCandidate = function(dur, pInit, selectedCell, table, lock) {
@@ -282,8 +276,6 @@
 				};
 
 				requestAnimationFrame(ANIMATION);
-
-				console.log("selectCandidate");
 			};
 
 			ColoredVote.deselectCandidate = function(dur, pInit, selectedCell, table, lock) {
@@ -336,8 +328,6 @@
 				};
 
 				requestAnimationFrame(ANIMATION);
-
-				console.log("deselectCandidate");
 			};
 
 			/**
@@ -376,8 +366,6 @@
 						}
 					});
 				}
-
-				console.log("installClickAnimations");
 			};
 		</script>
 
@@ -387,25 +375,24 @@
 			 * This function handles everything that must happen once the DOM has
 			 * finished loading.
 			 */
-			ColoredVote.loadHandler = function(e) {
-				const NUM_CANDIDATES = 4;
-				const FADE_IN_DUR_MS = 450;
-				const SELECT_ANIM_DUR_MS = 150;
+			ColoredVote.loadHandler = function(numCandidates, fadeInDurMs, selectDurMs) {
 				const table = document.getElementById("candidates");
 
-				const p = ColoredVote.addAvailableCandidates(NUM_CANDIDATES, table);
-				ColoredVote.fadeInCandidates(SELECT_ANIM_DUR_MS, p, FADE_IN_DUR_MS, table, ColoredVote.installClickAnimations);
-
-				console.log("loadHandler");
+				const p = ColoredVote.addAvailableCandidates(numCandidates, table);
+				ColoredVote.fadeInCandidates(selectDurMs, p, fadeInDurMs, table, ColoredVote.installClickAnimations);
 			};
 
 			/**
 			 * This function starts the ColoredVote system on the browser.
 			 */
 			ColoredVote.start = function () {
-				window.addEventListener("load", ColoredVote.loadHandler);
+				window.addEventListener("load", e => {
+					const NUM_CANDIDATES = 4;
+					const FADE_IN_DUR_MS = 450;
+					const SELECT_ANIM_DUR_MS = 150;
 
-				console.log("start");
+					ColoredVote.loadHandler(NUM_CANDIDATES, FADE_IN_DUR_MS, SELECT_ANIM_DUR_MS);
+				});
 			};
 		</script>
 
